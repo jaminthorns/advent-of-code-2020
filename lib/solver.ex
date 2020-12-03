@@ -16,9 +16,7 @@ defmodule Solver do
   end
 
   defp read_input(day) do
-    "input/day_#{day}.txt"
-    |> File.read!()
-    |> String.trim()
+    File.read!("input/day_#{day}.txt")
   end
 
   defp day_module(day) do

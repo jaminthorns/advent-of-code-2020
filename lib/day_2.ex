@@ -1,12 +1,16 @@
 defmodule Day2 do
   @behaviour Solution
 
+  @test_input """
+  1-3 a: abcde
+  1-3 b: cdefg
+  2-9 c: ccccccccc
+  """
+
   @password_pattern ~r/(?<num_a>\d+)-(?<num_b>\d+) (?<letter>[a-z]): (?<password>\w+)/
 
   @doc """
-  iex> solve_part_1("1-3 a: abcde
-  ...> 1-3 b: cdefg
-  ...> 2-9 c: ccccccccc")
+  iex> solve_part_1(#{inspect(@test_input)})
   2
   """
   def solve_part_1(input) do
@@ -16,9 +20,7 @@ defmodule Day2 do
   end
 
   @doc """
-  iex> solve_part_2("1-3 a: abcde
-  ...> 1-3 b: cdefg
-  ...> 2-9 c: ccccccccc")
+  iex> solve_part_2(#{inspect(@test_input)})
   1
   """
   def solve_part_2(input) do
@@ -29,7 +31,7 @@ defmodule Day2 do
 
   defp passwords(input) do
     input
-    |> String.split("\n")
+    |> String.split("\n", trim: true)
     |> Enum.map(&Regex.named_captures(@password_pattern, &1))
     |> Enum.map(fn entry ->
       %{

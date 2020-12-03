@@ -1,13 +1,17 @@
 defmodule Day1 do
   @behaviour Solution
 
-  @doc ~S"""
-  iex> solve_part_1("1721
-  ...> 979
-  ...> 366
-  ...> 299
-  ...> 675
-  ...> 1456")
+  @test_input """
+  1721
+  979
+  366
+  299
+  675
+  1456
+  """
+
+  @doc """
+  iex> solve_part_1(#{inspect(@test_input)})
   514579
   """
   def solve_part_1(input) do
@@ -16,13 +20,8 @@ defmodule Day1 do
     |> find_product_by_sum(2020, 2)
   end
 
-  @doc ~S"""
-  iex> solve_part_2("1721
-  ...> 979
-  ...> 366
-  ...> 299
-  ...> 675
-  ...> 1456")
+  @doc """
+  iex> solve_part_2(#{inspect(@test_input)})
   241861950
   """
   def solve_part_2(input) do
