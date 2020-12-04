@@ -1,6 +1,8 @@
 defmodule Day4 do
   @behaviour Solution
 
+  @required_fields ~w(byr iyr eyr hgt hcl ecl pid)
+
   @test_input """
   ecl:gry pid:860033327 eyr:2020 hcl:#fffffd
   byr:1937 iyr:2017 cid:147 hgt:183cm
@@ -17,8 +19,6 @@ defmodule Day4 do
   iyr:2011 ecl:brn hgt:59in
   """
 
-  @required_fields ~w(byr iyr eyr hgt hcl ecl pid)
-
   @doc """
   iex> solve_part_1(#{inspect(@test_input)})
   2
@@ -29,7 +29,7 @@ defmodule Day4 do
     |> Enum.count(&has_all_fields?/1)
   end
 
-  @all_invalid_test_input """
+  @test_input_invalid """
   eyr:1972 cid:100
   hcl:#18171d ecl:amb hgt:170 pid:186cm iyr:2018 byr:1926
 
@@ -45,7 +45,7 @@ defmodule Day4 do
   pid:3556412378 byr:2007
   """
 
-  @all_valid_test_input """
+  @test_input_valid """
   pid:087499704 hgt:74in ecl:grn iyr:2012 eyr:2030 byr:1980
   hcl:#623a2f
 
@@ -61,10 +61,10 @@ defmodule Day4 do
   """
 
   @doc """
-  iex> solve_part_2(#{inspect(@all_invalid_test_input)})
+  iex> solve_part_2(#{inspect(@test_input_invalid)})
   0
 
-  iex> solve_part_2(#{inspect(@all_valid_test_input)})
+  iex> solve_part_2(#{inspect(@test_input_valid)})
   4
   """
   def solve_part_2(input) do
