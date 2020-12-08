@@ -1,10 +1,10 @@
 defmodule Day7 do
   @behaviour Solution
 
-  @rule_pattern ~r/(?<color>.*?) bags contain (?<contents>.*)./
-  @contents_pattern ~r/(?<count>\d+) (?<color>.*) bags?/
+  @rule_pattern ~r/(?<color>.*?) bags contain (?<children>.*)./
+  @children_pattern ~r/(?<count>\d+) (?<color>.*) bags?/
 
-  @complex_test_input """
+  @test_input """
   light red bags contain 1 bright white bag, 2 muted yellow bags.
   dark orange bags contain 3 bright white bags, 4 muted yellow bags.
   bright white bags contain 1 shiny gold bag.
@@ -16,7 +16,7 @@ defmodule Day7 do
   dotted black bags contain no other bags.
   """
 
-  @simple_test_input """
+  @nested_test_input """
   shiny gold bags contain 2 dark red bags.
   dark red bags contain 2 dark orange bags.
   dark orange bags contain 2 dark yellow bags.
@@ -27,23 +27,21 @@ defmodule Day7 do
   """
 
   @doc """
-  iex> solve_part_1(#{inspect(@complex_test_input)})
+  iex> solve_part_1(#{inspect(@test_input)})
   4
   """
   def solve_part_1(input) do
     input
     |> rules()
-    |> containers()
-    |> parent_count("shiny gold")
-    |> Enum.uniq()
-    |> length()
+    |> parents("shiny gold")
+    |> MapSet.size()
   end
 
   @doc """
-  iex> solve_part_2(#{inspect(@complex_test_input)})
+  iex> solve_part_2(#{inspect(@test_input)})
   32
 
-  iex> solve_part_2(#{inspect(@simple_test_input)})
+  iex> solve_part_2(#{inspect(@nested_test_input)})
   126
   """
   def solve_part_2(input) do
@@ -55,53 +53,32 @@ defmodule Day7 do
   defp rules(input) do
     input
     |> String.split("\n", trim: true)
-    |> Map.new(fn line ->
-      rule = Regex.named_captures(@rule_pattern, line)
-
-      contents =
-        case rule["contents"] do
-          "no other bags" ->
-            []
-
-          contents ->
-            contents
-            |> String.split(", ")
-            |> Enum.map(&Regex.named_captures(@contents_pattern, &1))
-            |> Enum.map(&{String.to_integer(&1["count"]), &1["color"]})
-        end
-
-      {rule["color"], contents}
+    |> Enum.map(&Regex.named_captures(@rule_pattern, &1))
+    |> Map.new(fn
+      %{"color" => color, "children" => "no other bags"} -> {color, %{}}
+      %{"color" => color, "children" => children} -> {color, rule_children(children)}
     end)
   end
 
-  defp containers(rules) do
+  defp rule_children(children) do
+    children
+    |> String.split(", ")
+    |> Enum.map(&Regex.named_captures(@children_pattern, &1))
+    |> Map.new(&{&1["color"], String.to_integer(&1["count"])})
+  end
+
+  defp parents(rules, color) do
     rules
-    |> Enum.flat_map(fn {container, bags} ->
-      Enum.map(bags, fn {_count, bag} -> {bag, container} end)
-    end)
-    |> Enum.group_by(&elem(&1, 0), &elem(&1, 1))
-  end
-
-  defp parent_count(containers, color, colors \\ []) do
-    containers
-    |> Map.get(color)
-    |> case do
-      nil -> colors
-      parents -> Enum.flat_map(parents, &parent_count(containers, &1, [&1 | colors]))
-    end
+    |> Enum.filter(fn {_color, children} -> Map.has_key?(children, color) end)
+    |> Enum.map(&elem(&1, 0))
+    |> Enum.map(fn parent -> rules |> parents(parent) |> MapSet.put(parent) end)
+    |> Enum.reduce(MapSet.new(), &MapSet.union/2)
   end
 
   defp child_count(rules, color) do
     rules
     |> Map.get(color)
-    |> case do
-      [] ->
-        0
-
-      children ->
-        children
-        |> Enum.map(fn {count, color} -> count + count * child_count(rules, color) end)
-        |> Enum.sum()
-    end
+    |> Enum.map(fn {color, count} -> count + count * child_count(rules, color) end)
+    |> Enum.sum()
   end
 end
