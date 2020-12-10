@@ -10,4 +10,5 @@ defmodule AllDaysTest do
   doctest Day7, import: true, tags: :day_7
   doctest Day8, import: true, tags: :day_8
   doctest Day9, import: true, tags: :day_9
+  doctest Day10, import: true, tags: :day_10
 end
