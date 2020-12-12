@@ -6,8 +6,8 @@ defmodule Solution do
   Solve a puzzle for a given `day` and `part`.
   """
   def solve(day, part) do
+    module = Module.concat(["Day#{day}"])
     input = File.read!("input/day_#{day}.txt")
-    module = String.to_atom("Elixir.Day#{day}")
 
     case part do
       1 -> module.solve_part_1(input)

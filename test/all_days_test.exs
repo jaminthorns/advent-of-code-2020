@@ -1,16 +1,24 @@
 defmodule AllDaysTest do
   use ExUnit.Case
 
-  doctest Day1, import: true, tags: :day_1
-  doctest Day2, import: true, tags: :day_2
-  doctest Day3, import: true, tags: :day_3
-  doctest Day4, import: true, tags: :day_4
-  doctest Day5, import: true, tags: :day_5
-  doctest Day6, import: true, tags: :day_6
-  doctest Day7, import: true, tags: :day_7
-  doctest Day8, import: true, tags: :day_8
-  doctest Day9, import: true, tags: :day_9
-  doctest Day10, import: true, tags: :day_10
-  doctest Day11, import: true, tags: :day_11
-  doctest Day12, import: true, tags: :day_12
+  behaviours = fn module ->
+    :attributes
+    |> module.__info__()
+    |> Keyword.get(:behaviour, [])
+  end
+
+  day = fn module ->
+    module
+    |> Module.split()
+    |> List.first()
+    |> String.replace_prefix("Day", "")
+  end
+
+  Solution
+  |> Application.get_application()
+  |> Application.spec(:modules)
+  |> Enum.filter(&(Solution in behaviours.(&1)))
+  |> Enum.map(fn module ->
+    doctest module, import: true, tags: String.to_atom("day_#{day.(module)}")
+  end)
 end
